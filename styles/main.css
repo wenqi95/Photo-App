@@ -1,0 +1,19 @@
+/*
+CSS for the CS142 project #5 main page
+
+Since CSS uses a global name space for classes we should use class names starting with
+cs142-main- here.
+*/
+.cs142-main-root {
+  width: 75%;
+}
+
+.cs142-main-topbar-buffer {
+  margin-top: 70px;
+}
+
+.cs142-main-grid-item {
+  width: 75%;
+  /*height: calc(100vh - 85px);*/
+  padding: 10px;
+}
