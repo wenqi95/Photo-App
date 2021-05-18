@@ -1,4 +1,3 @@
-//ts-check
 import React from 'react';
 import {
   Typography,
@@ -15,23 +14,39 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import { Link } from "react-router-dom";
 import './userPhotos.css';
+import fetchModel from "../../lib/fetchModelData";
 
 const PHOTOS = "Photos of ";
 
 /**
- * Define UserPhotos, a React componment of CS142 project #5
+ * Define UserPhotos
  */
 class UserPhotos extends React.Component {
   constructor(props) {
     super(props);
-    let userId = props.match.params.userId;
-    let user = window.cs142models.userModel(userId);
-    let photos =  window.cs142models.photoOfUserModel(userId);
+    let newUser;
+    let newPhotos;
     this.state = {
-      user: user,
-      photos: photos
+      user: newUser,
+      photos: newPhotos
     };
-    this.props.changeView(PHOTOS, `${this.state.user.first_name} ${this.state.user.last_name}`);
+  }
+
+  componentDidMount = () => {
+    let newUserId = this.props.match.params.userId;
+    let photoProm = fetchModel(`http://localhost:3000/photosOfUser/${newUserId}`);
+    photoProm.then(response => {
+      this.setState({photos: response.data});
+      console.log('photo fetched');
+      console.log(this.state.photos);
+    });
+    let userProm = fetchModel(`http://localhost:3000/user/${newUserId}`);
+    userProm.then(response => {
+      this.setState({user: response.data});
+      console.log(this.state.user);
+      console.log('user fetched');
+      //this.props.changeView(DETAILS, `${this.state.user.first_name} ${this.state.user.last_name}`);
+    });
   }
 
   render() {

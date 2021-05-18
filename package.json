@@ -21,7 +21,7 @@
     "express": "^4.16.4",
     "file-loader": "^3.0.1",
     "js-yaml": "^3.13.1",
-    "mongoose": "^5.12.6",
+    "mongoose": "^5.12.9",
     "nodemon": "^2.0.2",
     "prismjs": "^1.23.0",
     "promise": "^8.0.2",

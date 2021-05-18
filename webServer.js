@@ -130,7 +130,27 @@ app.get('/test/:p1', function (request, response) {
  * URL /user/list - Return all the User object.
  */
 app.get('/user/list', function (request, response) {
-    response.status(200).send(cs142models.userListModel());
+    User.find({}, function (err, info) {
+        if (err) {
+            console.error('Doing /user/list error', err);
+            response.status(500).send(JSON.stringify(err));
+            return;
+        }
+        if (info.length === 0 ) {
+            response.status(500).send('Missing User');
+            return;
+        }
+        console.log('User', info[0]);
+        // create an array of the user properties containing (_id, first_name, last_name)
+        var userInfo = info.map(user => ({
+            _id : user._id,
+            first_name: user.first_name,
+            last_name: user.last_name
+        })
+        );
+        response.end(JSON.stringify(userInfo));
+    });
+
 });
 
 /*
@@ -138,28 +158,69 @@ app.get('/user/list', function (request, response) {
  */
 app.get('/user/:id', function (request, response) {
     var id = request.params.id;
-    var user = cs142models.userModel(id);
-    if (user === null) {
-        console.log('User with _id:' + id + ' not found.');
-        response.status(400).send('Not found');
-        return;
+    User.find({_id: id}, function (err, user) {
+        if (err) {
+            console.error('Doing /user/:id', err);
+            response.status(500).send(JSON.stringify(err));
+            return;
+        }
+        if (user.length === 0) {
+            console.log('User with _id:' + id + ' not found.');
+            response.status(400).send('Not found');
+            return;
+        }
+        response.end(JSON.stringify(user[0]));
     }
-    response.status(200).send(user);
+    );
+    
 });
 
 /*
  * URL /photosOfUser/:id - Return the Photos for User (id)
  */
-app.get('/photosOfUser/:id', function (request, response) {
-    var id = request.params.id;
-    var photos = cs142models.photoOfUserModel(id);
-    if (photos.length === 0) {
-        console.log('Photos for user with _id:' + id + ' not found.');
-        response.status(400).send('Not found');
-        return;
-    }
-    response.status(200).send(photos);
-});
+// app.get('/photosOfUser/:id', function (request, response) {
+//     var id = request.params.id;
+//     Photo.find({user_id: id}, function (err, photos) {
+//         if (err) {
+//             console.error('Doing /photoOfUser/:id', err);
+//             response.status(500).send(JSON.stringify(err));
+//             return;
+//         }
+//         if (photos.length === 0) {
+//             console.log('Photos for user with _id:' + id + ' not found.');
+//             response.status(400).send('Not found');
+//             return;
+//         }
+//         let newPhotos = JSON.parse(JSON.stringify(photos));
+//         async.each(newPhotos, function(photo, done_callback){
+//             delete photo._v;
+//             async.each(photo.comments, function(com, done_callback2) {
+//                 User.find({_id: photo.user_id}, function (err, user) {
+//                     if (err) {
+//                         response.status(400).send('Not found');
+//                     }
+//                     let {_id, first_name, last_name} = user;
+//                     com.user = {_id, first_name, last_name};
+//                     delete com.user_id;
+//                 }, function (err) {
+//                     if (err) {
+//                         done_callback2(err);
+//                     }
+//                 }
+//                 );
+//             });
+
+//         }, function(err) {
+//             if (err) {
+//                 done_callback(err);
+//                 response.status(500).send(JSON.stringify(err));
+//             } else {
+//                 console.log(photos)
+//                 response.end(JSON.stringify(photos));
+//             }
+//         });
+//     });
+// });
 
 
 var server = app.listen(3000, function () {
